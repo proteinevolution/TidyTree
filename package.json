@@ -2,7 +2,7 @@
   "version": "0.5.7",
   "description": "Uncompromisingly Flexible Phylogenetic Trees, Powered by D3.js",
   "name": "tidytree",
-  "main": "dist/tidytree.js",
+  "main": "src/main.js",
   "scripts": {
     "all": "npm run build && npm run minify && npm run doc",
     "build": "rollup -c",
