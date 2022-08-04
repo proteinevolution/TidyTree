@@ -11,7 +11,7 @@ import {cluster, hierarchy, tree as d3Tree} from 'd3-hierarchy';
  * @param {String} newick A valid newick string
  * @param {Object} options A Javascript object containing options to set up the tree
  */
-export default function TidyTree(data, options, events) {
+export function TidyTree(data, options, events) {
   let defaults = {
     layout: "vertical",
     type: "tree",

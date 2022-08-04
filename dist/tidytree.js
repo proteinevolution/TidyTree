@@ -1,4 +1,4 @@
-var TidyTree = (function () {
+var TidyTree = (function (exports) {
   'use strict';
 
   (function (global, factory) {
@@ -7395,6 +7395,8 @@ var TidyTree = (function () {
     }
   };
 
-  return TidyTree;
+  exports.TidyTree = TidyTree;
 
-}());
+  return exports;
+
+}({}));
