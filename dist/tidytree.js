@@ -1305,8 +1305,7 @@ var TidyTree = (function () {
     if (!data) throw Error("Invalid Data");
     this.data = data;
     this.range = [Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER];
-    this.hierarchy = d3
-      .hierarchy(this.data, d => d.children)
+    this.hierarchy = hierarchy(this.data, d => d.children)
       .eachBefore(d => {
         d.value =
           (d.parent ? d.parent.value : 0) + (d.data.length ? d.data.length : 0);

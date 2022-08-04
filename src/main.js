@@ -1,4 +1,10 @@
 import "patristic";
+import {axisBottom, axisLeft} from 'd3-axis';
+import {scaleLinear} from 'd3-scale';
+import {select} from 'd3-selection';
+import {linkHorizontal, linkRadial, linkVertical} from 'd3-shape';
+import {zoom, zoomIdentity} from 'd3-zoom';
+import {cluster, hierarchy, tree as d3Tree} from 'd3-hierarchy';
 
 /**
  * This class function creates a TidyTree object.
@@ -59,8 +65,7 @@ TidyTree.prototype.setData = function (data) {
   if (!data) throw Error("Invalid Data");
   this.data = data;
   this.range = [Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER];
-  this.hierarchy = d3
-    .hierarchy(this.data, d => d.children)
+  this.hierarchy = hierarchy(this.data, d => d.children)
     .eachBefore(d => {
       d.value =
         (d.parent ? d.parent.value : 0) + (d.data.length ? d.data.length : 0);
@@ -112,14 +117,14 @@ TidyTree.prototype.draw = function (selector) {
   if (!selector && !this.parent) {
     throw Error("No valid target for drawing given! Where should the tree go?");
   }
-  let parent = (this.parent = d3.select(selector ? selector : this.parent));
+  let parent = (this.parent = select(selector ? selector : this.parent));
 
   this.width =
     parseFloat(parent.style("width")) - this.margin[1] - this.margin[3];
   this.height =
     parseFloat(parent.style("height")) - this.margin[0] - this.margin[2] - 25;
 
-  let tree = d3.tree();
+  let tree = d3Tree();
 
   let svg = parent
     .html(null)
@@ -136,8 +141,8 @@ TidyTree.prototype.draw = function (selector) {
     .attr("y", -5)
     .attr("fill", "white");
 
-  this.zoom = d3.zoom().on("zoom", () => {
-    let transform = (this.transform = d3.event.transform);
+  this.zoom = zoom().on("zoom", (event) => {
+    let transform = (this.transform = event.transform);
     g.attr(
       "transform",
       `translate(${transform.x},${transform.y}) scale(${transform.k}) rotate(${
@@ -165,16 +170,13 @@ const getX = d => d.x,
 let linkTransformers = {
   tree: {
     smooth: {
-      horizontal: d3
-        .linkHorizontal()
+      horizontal: linkHorizontal()
         .x(getY)
         .y(getX),
-      vertical: d3
-        .linkVertical()
+      vertical: linkVertical()
         .x(getX)
         .y(getY),
-      circular: d3
-        .linkRadial()
+      circular: linkRadial()
         .angle(getX)
         .radius(getY)
     },
@@ -245,16 +247,13 @@ let linkTransformers = {
   },
   weighted: {
     smooth: {
-      horizontal: d3
-        .linkHorizontal()
+      horizontal: linkHorizontal()
         .x(getLength)
         .y(getX),
-      vertical: d3
-        .linkVertical()
+      vertical: linkVertical()
         .x(getX)
         .y(getLength),
-      circular: d3
-        .linkRadial()
+      circular: linkRadial()
         .angle(getX)
         .radius(getLength)
     },
@@ -457,7 +456,7 @@ TidyTree.prototype.redraw = function () {
 
   let g = parent.select("svg g");
 
-  let source = (this.type === "tree" ? d3.tree() : d3.cluster()).size(
+  let source = (this.type === "tree" ? d3Tree() : cluster()).size(
     this.layout === "circular"   ? [2 * Math.PI, Math.min(this.height, this.width) / 2] :
     this.layout === "horizontal" ? [this.height, this.width] :
     [this.width, this.height]
@@ -676,13 +675,13 @@ function updateRuler(transform) {
         .attr("width", "25px")
         .attr("x", -25);
     }
-    let axis = this.layout == "horizontal" ? d3.axisBottom() : d3.axisLeft();
+    let axis = this.layout == "horizontal" ? axisBottom() : axisLeft();
     if (this.type === "tree" && this.layout !== "circular") {
       ruler
         .attr("opacity", 1)
         .call(
           axis.scale(
-            d3.scaleLinear(
+            scaleLinear(
               [0, this.hierarchy.height / transform.k],
               [0, this.scalar]
             )
@@ -693,7 +692,7 @@ function updateRuler(transform) {
         .attr("opacity", 1)
         .call(
           axis.scale(
-            d3.scaleLinear(
+            scaleLinear(
               [this.range[0], this.range[1] / transform.k],
               [0, this.scalar]
             )
@@ -728,7 +727,7 @@ TidyTree.prototype.recenter = function () {
   svg
     .transition()
     .duration(this.animation)
-    .call(this.zoom.transform, d3.zoomIdentity.translate(x, y));
+    .call(this.zoom.transform, zoomIdentity.translate(x, y));
   return this;
 };
 
