@@ -1,4 +1,4 @@
-import "patristic";
+import {Branch, parseNewick} from "patristic";
 import {axisBottom, axisLeft} from 'd3-axis';
 import {scaleLinear} from 'd3-scale';
 import {select} from 'd3-selection';
@@ -44,7 +44,7 @@ export function TidyTree(data, options, events) {
 
   if (this.parent) this.draw(this.parent);
 
-  if (data instanceof patristic.Branch) {
+  if (data instanceof Branch) {
     this.setData(data);
   } else {
     this.setTree(data);
@@ -87,7 +87,7 @@ TidyTree.prototype.setData = function (data) {
  */
 TidyTree.prototype.setTree = function (newick) {
   if (!newick) throw Error("Invalid Newick String");
-  return this.setData(patristic.parseNewick(newick));
+  return this.setData(parseNewick(newick));
 };
 
 /**
